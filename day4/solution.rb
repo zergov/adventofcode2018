@@ -63,9 +63,9 @@ sleep_time.each do |id, minutes|
   puts "#{id} total:#{total} | max minute: #{minutes.max_by{|k, v| v}}"
   mins = minutes.max_by{|k, v| v}
   if mins
-    if total > besttotal
-      besttotal = total
-      bestmin = mins[0]
+    if mins[1] > bestmin
+      bestmin = mins[1]
+      besttotal = mins[0]
       bestid = id
     end
   end
@@ -73,4 +73,4 @@ sleep_time.each do |id, minutes|
 end
 
 puts bestmin
-puts bestmin.to_i * bestid.to_i
+puts besttotal.to_i * bestid.to_i
