@@ -20,23 +20,34 @@ File.readlines('input.txt').each do |instruction|
   end
 end
 
-workers = [nil, nil]
+worker_count = 5
+workers = []
 todos = []
+time = 0
+
 while !all_tasks.empty?
-  todo = (all_tasks - requirements.keys).to_a
-  todo = todo.sort!.first
-  todos << todo
-  all_tasks.delete(todo)
+  available_steps = (all_tasks - requirements.keys).to_a.sort
+  available_steps.select! {|step| !workers.any? {|activestep, time| step == activestep }}
+  p available_steps
+  available_steps.each {|step| workers << [step, (step.ord - 64) + 60] if workers.size < worker_count }
 
-  requirements.values.each do |values|
-    values.delete(todo)
+  p workers
+  # time is running
+  workers = workers.map {|step, time| [step, time -= 1]}
+  # remove done steps from requirements
+  workers.select {|step, time| time == 0}.each do |step, time|
+    todos << step
+    requirements.values.each do |values|
+      values.delete(step)
+    end
+    all_tasks.delete(step)
   end
 
-  requirements.delete_if do |k, v|
-    v.empty?
-  end
+  workers = workers.select {|step, time| time > 0}
 
-  p all_tasks
+  # delete empty requirements
+  requirements.delete_if { |k, v| v.empty? }
+  time += 1
 end
 
-puts todos.join
+puts time
