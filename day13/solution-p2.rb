@@ -3,12 +3,13 @@
 require 'set'
 
 class Car
-  attr_accessor :velocity, :position
+  attr_accessor :velocity, :position, :alive
 
   def initialize(char, position)
     @velocity = setup_velocity(char)
     @position = position
     @intersection_count = 0
+    @alive = true
   end
 
   def draw
@@ -107,12 +108,11 @@ height.times do |row|
 end
 
 # simulation
-tick = 0
-until cars.size == 1 do
-  puts "starting tick #{tick}" if tick % 100 == 0
+while true do
+  # puts "ticking"
   # debug_road = road.map(&:dup)
   # debug_road.each.with_index do |row, i|
-    # cars_to_show = cars.select { |car| car.position[1] == i }
+    # cars_to_show = cars.select { |car| car.position[1] == i && car.alive }
     # cars_to_show.each {|car| row[car.position[0]] = car.draw }
     # puts row.join
   # end
@@ -125,43 +125,43 @@ until cars.size == 1 do
   # they take turns moving a single step at a time.
   # They do this based on their current location: carts on the top row move first (acting from left to right),
   # then carts on the second row move (again from left to right), then carts on the third row, and so on.
-  moved = Set.new
-  height.times do |row|
-    # respect car movement priority
-    cars_to_move = cars
-      .select {|car| car.position[1] == row}    # find all car in this row, 
-      .sort_by {|car| car.velocity[0]}          # sort them from left to right
-      .select {|car| !moved.include?(car) }     # only take the ones that did not move this tick
+  # moved = Set.new
+  cars.sort_by! {|car| [car.position[1], car.position[0]]}
+  cars.each do |car|
+    next unless car.alive
+    
+    x, y = car.position
+    vx, vy = car.velocity
 
-    cars_to_move.each do |car|
-      x, y = car.position
-      vx, vy = car.velocity
+    # check for colisions
+    colision = cars.find {|car2| (car2.position == car.position) && car2.alive && car2 != car }
+    if colision
+      p colision
+      puts "crash"
+      # p colision.position
+      # p car.position
+      # puts "printing colision details"
+      # p colision
+      car.alive = false
+      colision.alive = false
 
-      # move the car
-      car.position = [x + vx, y + vy]
-
-      # calculate new velocity
-      x, y = car.position
-      new_position = road[y][x]
-      car.update_velocity(new_position)
-
-      # add this car to the moved set
-      moved << car
+      alived = cars.select {|car| car.alive}
+      # puts "printing alived car"
+      puts alived.size
+      # p alived
+      if alived.size == 1
+        p alived.first.position
+        raise Error
+      end
+      next
     end
 
-    colisions = cars
-      .group_by {|car| car.position }
-      .select {|position, cars| cars.size > 1}
+    # move the car
+    car.position = [x + vx, y + vy]
 
-    # remove cars when there is colisions
-    if colisions.size > 0
-      puts "removing following cars"
-      puts colisions.values.flatten
-      cars = cars - colisions.values.flatten
-    end
+    # calculate new velocity
+    x, y = car.position
+    new_position = road[y][x]
+    car.update_velocity(new_position)
   end
-
-  tick += 1
 end
-
-p cars.first.position
