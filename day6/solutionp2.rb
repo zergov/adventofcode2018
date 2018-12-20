@@ -5,7 +5,7 @@ def dist(a, b)
 end
 
 coordinates = {}
-File.readlines('input.example').each.with_index do |coord, index|
+File.readlines('input.txt').each.with_index do |coord, index|
   name = index.to_s
   coordinate = coord.split(',').map(&:strip).map(&:to_i)
   coordinates[name] = coordinate
@@ -36,19 +36,17 @@ infinites << size.times.to_a.map {|n| grid[n][0] }.map(&:itself).map(&:downcase)
 infinites << size.times.to_a.map {|n| grid[n][size - 1] }.map(&:itself).map(&:downcase)
 infinites = infinites.flatten.select {|x| x != '.' }.uniq
 
+area = 0
+size.times do |y|
+  size.times do |x|
+    name = grid[y][x]
 
-puts "coordinates:"
-p coordinates
+    total_dist = coordinates
+      .map {|(name, position)| dist([x, y], position) }
+      .reduce(:+)
 
-puts "infinites:"
-p infinites
+     area += 1 if total_dist < 10000
+  end
+end
 
-answer = grid
-  .flatten
-  .map(&:downcase)
-  .select {|x| x != '.' && !infinites.include?(x) }
-  # .group_by(&:itself)
-  # .map {|k, v| [k, v.size]}
-  # .sort_by {|k, v| -v}.first.last
-
-puts "p1 answer: #{answer}"
+p area
