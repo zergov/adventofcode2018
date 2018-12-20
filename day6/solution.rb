@@ -5,49 +5,50 @@ def dist(a, b)
 end
 
 coordinates = {}
-coordinates_points = {}
 File.readlines('input.txt').each.with_index do |coord, index|
-  name = (index + 65).chr
+  name = index.to_s
   coordinate = coord.split(',').map(&:strip).map(&:to_i)
-  coordinates[coordinate] = name
-  coordinates_points[name] = coordinate
+  coordinates[name] = coordinate
 end
 
-p coordinates_points
-p coordinates
-
-size = 10
+size = 500
 grid = Array.new(size).map { Array.new(size).map {'.'} }
 
 size.times do |y|
   size.times do |x|
-    coordinates.each do |(cx, cy), name|
-      cell_coordinate_distance = dist([x, y],[cx, cy])
+    closests = coordinates
+      .map {|name, coordinate| [name, dist(coordinate, [x, y])] }
+      .group_by {|name, distance| distance }
+      .sort
 
-      # if current cell is a dot, claim that cell
-      if grid[y][x] == '.'
-        grid[y][x] = name.downcase
-      elsif grid[y][x] == '*'
-        next
-      else
-        other = grid[y][x].upcase   # else, this is already claimed by an other point
-        cell_coordinate_other = dist([x,y], coordinates_points[other])
-
-        # if the distance between the current cell and the coordinate we're checking
-        # is smaller than the coordinate by which its already claimed, override
-        # the other coordinate.
-        if  cell_coordinate_distance < cell_coordinate_other
-          grid[y][x] = name.downcase
-        elsif cell_coordinate_distance == cell_coordinate_other
-          grid[y][x] = '*'
-        end
-      end
+    if closests.first.last.size >= 2
+      grid[y][x] = '.'
+    else
+      grid[y][x] = closests.first.last.first.first.downcase
     end
   end
 end
 
-coordinates.each do |(x, y), name|
-  grid[y][x] = name
-end
+infinites = []
+infinites << grid[0].map(&:itself).map(&:downcase)
+infinites << grid[size - 1].map(&:itself).map(&:downcase)
+infinites << size.times.to_a.map {|n| grid[n][0] }.map(&:itself).map(&:downcase)
+infinites << size.times.to_a.map {|n| grid[n][size - 1] }.map(&:itself).map(&:downcase)
+infinites = infinites.flatten.select {|x| x != '.' }.uniq
 
-grid.each {|row| puts row.join}
+
+puts "coordinates:"
+p coordinates
+
+puts "infinites:"
+p infinites
+
+answer = grid
+  .flatten
+  .map(&:downcase)
+  .select {|x| x != '.' && !infinites.include?(x) }
+  .group_by(&:itself)
+  .map {|k, v| [k, v.size]}
+  .sort_by {|k, v| -v}.first.last
+
+puts "p1 answer: #{answer}"
