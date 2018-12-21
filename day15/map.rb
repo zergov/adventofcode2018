@@ -22,6 +22,15 @@ class Map
   def draw
     puts @grid.map(&:join)
   end
+
+  def adjacents(x, y)
+    [
+      [x, y + 1], [x, y - 1],
+      [x + 1, y], [x - 1, y],
+    ]
+      .select {|x, y| x < @width && x >= 0 && y < @height && y >= 0 }
+      .select {|x, y| @grid[y][x] == '.' }
+  end
 end
 
 
