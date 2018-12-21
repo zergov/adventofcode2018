@@ -14,7 +14,7 @@ map.height.times do |y|
 end
 
 # define action order
-units.sort_by {|u| u.y * 999 + u.x}.each do |unit|
+units.sort_by {|u| u.y * 1000 + u.x}.each do |unit|
   enemy_type = unit.race == :goblin ? :elf : :goblin
   enemies = units.select {|enemy| enemy.race == enemy_type }
   adjacents = enemies

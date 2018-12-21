@@ -1,4 +1,5 @@
 require './unit'
+require 'set'
 
 class Map
   attr_reader :width, :height
@@ -30,6 +31,42 @@ class Map
     ]
       .select {|x, y| x < @width && x >= 0 && y < @height && y >= 0 }
       .select {|x, y| @grid[y][x] == '.' }
+  end
+
+  def path(from, to)
+    open = []
+    closed = Set.new
+    meta = {}
+
+    root = from
+    meta[root] = [nil, nil]
+    open.unshift(root)
+
+    until open.empty?
+      position = open.shift
+
+      if to == position
+        return "found a path"
+      end
+
+      successors(position).each do |child, action|
+        # next if child in closed
+        #
+        # unless open.include?(child)
+        #   meta[child] = (position, action)
+        #   open.unshift(child)
+        # end
+        #
+        # closed.add(child)
+        # qqhcose comme ca
+      end
+    end
+  end
+
+  private
+
+  def successors(position)
+    # return adjacents of position + action associated with it
   end
 end
 
