@@ -1,10 +1,10 @@
 class Unit
   attr_accessor :position, :attack_power, :hp
 
-  def initialize(race, position)
+  def initialize(race, position, attack_power = 3)
     @race = race
     @position = position
-    @attack_power = 3
+    @attack_power = attack_power
     @hp = 200
   end
 
