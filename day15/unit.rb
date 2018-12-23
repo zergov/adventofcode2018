@@ -1,5 +1,5 @@
 class Unit
-  attr_accessor :position
+  attr_accessor :position, :attack_power, :hp
 
   def initialize(race, position)
     @race = race
@@ -24,5 +24,13 @@ class Unit
 
   def y
     @position[1]
+  end
+
+  def alive
+    @hp > 0
+  end
+
+  def dead
+    @hp <= 0
   end
 end
