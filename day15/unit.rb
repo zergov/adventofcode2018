@@ -9,8 +9,7 @@ class Unit
   end
 
   def to_s
-    return "G" if race == :goblin
-    return "E" if race == :elf
+    @race
   end
 
   def race

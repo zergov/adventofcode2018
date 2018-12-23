@@ -3,7 +3,7 @@ require './map'
 
 def simulate(attack)
   puts "Starting simulation with elf attack = #{attack}"
-  input = File.readlines('input.example')
+  input = File.readlines('input.txt')
   map = Map.new(input)
 
   units = []
@@ -82,30 +82,33 @@ def simulate(attack)
           target.hp -= unit.attack_power
         end
       end
-    end
 
-    if units.select {|u| u.race == :elf }.any?(&:dead)
-      return false
+      if units.select {|u| u.race == :elf }.any?(&:dead)
+        return false
+      end
+
+      elfs, goblins = units.select(&:alive).partition {|u| u.race == :elf }
+      if goblins.size == 0
+        total_hp = elfs.reduce(0) {|sum, u| sum + u.hp}
+        answer = total_hp * round
+        answer1 = total_hp * (round+1)
+
+        puts "total hp: #{total_hp}"
+        puts "total round: #{round}"
+        return [attack, "Game over, elfs win! answer: #{answer}, other answer: #{answer1}"]
+      end
     end
 
     units.select!(&:alive)
 
     puts "after round: #{round}"
     map.draw(units)
-
-    elfs, goblins = units.partition {|u| u.race == :elf }
-    if goblins.size == 0
-      answer = elfs.reduce(0) {|sum, u| sum + u.hp} * (round+1)
-      puts round
-      return [attack, "Game over, elfs win! answer: #{answer}"]
-    end
-
     round += 1
   end
 end
 
 outcomes = {}
-attacks = (4..100).to_a
+attacks = (12..50).to_a
 low = 0
 high = attacks.size - 1
 
