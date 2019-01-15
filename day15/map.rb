@@ -85,7 +85,7 @@ class Map
     x, y = position
     neighbors(x, y)
       .zip([:down, :up, :right, :left])
-      .sort_by {|(x, y), _| y * 10000 + y}
+      .sort_by {|(x, y), _| y * 10000 + x}
       .select do |(x, y), _|
         inbound = x < @width && x >= 0 && y < @height && y >= 0
         available = @grid[y][x] == '.'

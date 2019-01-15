@@ -108,7 +108,7 @@ def simulate(attack)
 end
 
 outcomes = {}
-attacks = (12..50).to_a
+attacks = (18..20).to_a
 low = 0
 high = attacks.size - 1
 
